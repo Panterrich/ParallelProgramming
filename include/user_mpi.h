@@ -81,6 +81,21 @@ public:
         m_error = MPI_Send(buffer, count, type, dst, tag, comm);
     }
 
+    inline void ssend(const void* buffer, int count, MPI_Datatype type, int dst, int tag, MPI_Comm comm)
+    {
+        m_error = MPI_Ssend(buffer, count, type, dst, tag, comm);
+    }
+
+    inline void rsend(const void* buffer, int count, MPI_Datatype type, int dst, int tag, MPI_Comm comm)
+    {
+        m_error = MPI_Rsend(buffer, count, type, dst, tag, comm);
+    }
+
+    inline void bsend(const void* buffer, int count, MPI_Datatype type, int dst, int tag, MPI_Comm comm)
+    {
+        m_error = MPI_Bsend(buffer, count, type, dst, tag, comm);
+    }
+
     inline void recv(void* buffer, int count, MPI_Datatype type, int src, int tag, MPI_Comm comm)
     {
         m_error = MPI_Recv(buffer, count, type, src, tag, comm, &m_status);
@@ -94,6 +109,11 @@ public:
     inline void reduce(const void* sendbuf, void* recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm)
     {
         m_error = MPI_Reduce(sendbuf, recvbuf, count, datatype, op, root, comm);
+    }
+
+    inline void barrier(MPI_Comm comm)
+    {
+        m_error = MPI_Barrier(comm);
     }
 
     inline int getCount(MPI_Datatype datatype)
@@ -120,7 +140,7 @@ private:
     int  m_len;
 
     int  m_error;
-    
+
 }; // class MPI
 
 } // UserMpi
