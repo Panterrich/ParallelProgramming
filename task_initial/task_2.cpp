@@ -1,4 +1,4 @@
-#include "include/UserMpi.h"
+#include "user_mpi.h"
 
 int main(int argc, char* argv[])
 {
