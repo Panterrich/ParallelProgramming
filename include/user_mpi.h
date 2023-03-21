@@ -91,6 +91,11 @@ public:
         m_error = MPI_Probe(src, tag, comm, &m_status);
     }
 
+    inline void reduce(const void* sendbuf, void* recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm)
+    {
+        m_error = MPI_Reduce(sendbuf, recvbuf, count, datatype, op, root, comm);
+    }
+
     inline int getCount(MPI_Datatype datatype)
     {
         int count = 0;
@@ -115,7 +120,8 @@ private:
     int  m_len;
 
     int  m_error;
-};
+    
+}; // class MPI
 
 } // UserMpi
 
