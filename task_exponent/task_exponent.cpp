@@ -64,30 +64,47 @@ int main(int argc, char* argv[])
         mpz_add(sum, sum, fuc);
     }
 
-    if (master.getCommSize() == 1)
+    if (master.getRank() < master.getCommSize() - 1)
     {
-        mpz_add_ui(sum, sum, 1);
+        master.probe(master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
+        if (master.check()) return 1;
 
-        mpf_t sumf = {};
-        mpf_t fucf = {};
-        
-        mpf_init(sumf);
-        mpf_init(fucf);
+        int count = master.getCount(MPI_CHAR);
+        if (master.check()) return 1;
 
-        mpf_set_z(sumf, sum);
-        mpf_set_z(fucf, fuc);
+        char* sum_str = new char[count]();
 
-        mpf_div(sumf, sumf, fucf);
+        master.recv(sum_str, count, MPI_CHAR, master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
+        if (master.check()) return 1;
 
-        gmp_printf("%.*Ff\n", x, sumf);
+        master.probe(master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
+        if (master.check()) return 1;
 
-        mpz_clears(fuc,  sum,  nullptr);
-        mpf_clears(fucf, sumf, nullptr);
+        count = master.getCount(MPI_CHAR);
+        if (master.check()) return 1;
 
-        return 0;
+        char* fuc_str = new char[count]();
+
+        master.recv(fuc_str, count, MPI_CHAR, master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
+        if (master.check()) return 1;
+
+        mpz_t sum_recv = {};
+        mpz_t fuc_recv = {};
+
+        mpz_init_set_str(sum_recv, sum_str, 10);
+        mpz_init_set_str(fuc_recv, fuc_str, 10);
+
+        delete [] sum_str;
+        delete [] fuc_str;
+
+        mpz_mul(sum_recv, sum_recv, fuc);
+        mpz_mul(fuc, fuc, fuc_recv);
+        mpz_add(sum, sum, sum_recv);
+
+        mpz_clears(sum_recv, fuc_recv, nullptr);
     }
 
-    if (master.getRank() == master.getCommSize() - 1)
+    if (master.getRank() > 0)
     {
         char* sum_str = mpz_get_str(nullptr, 10, sum);
         char* fuc_str = mpz_get_str(nullptr, 10, fuc);
@@ -107,45 +124,8 @@ int main(int argc, char* argv[])
         mpz_clears(fuc, sum, nullptr);
     }
 
-    else if (master.getRank() == 0)
+    else
     {
-        master.probe(master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        int count = master.getCount(MPI_CHAR);
-        if (master.check()) return 1;
-
-        char* sum_str = new char[count]();
-
-        master.recv(sum_str, count, MPI_CHAR, master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        master.probe(master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        count = master.getCount(MPI_CHAR);
-        if (master.check()) return 1;
-
-        char* fuc_str = new char[count]();
-
-        master.recv(fuc_str, count, MPI_CHAR, master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        mpz_t sum_recv = {};
-        mpz_t fuc_recv = {};
-
-        mpz_init_set_str(sum_recv, sum_str, 10);
-        mpz_init_set_str(fuc_recv, fuc_str, 10);
-
-        delete [] sum_str;
-        delete [] fuc_str;
-
-        mpz_mul(sum_recv, sum_recv, fuc);
-        mpz_mul(fuc, fuc, fuc_recv);
-        mpz_add(sum, sum, sum_recv);
-
-        mpz_clears(sum_recv, fuc_recv, nullptr);
-
         mpz_add_ui(sum, sum, 1);
 
         mpf_t sumf = {};
@@ -163,65 +143,6 @@ int main(int argc, char* argv[])
 
         mpz_clears(fuc,  sum,  nullptr);
         mpf_clears(fucf, sumf, nullptr);
-
-        return 0;
-    }
-
-    else
-    {
-        master.probe(master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        int count = master.getCount(MPI_CHAR);
-        if (master.check()) return 1;
-
-        char* sum_str = new char[count]();
-
-        master.recv(sum_str, count, MPI_CHAR, master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        master.probe(master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        count = master.getCount(MPI_CHAR);
-        if (master.check()) return 1;
-
-        char* fuc_str = new char[count]();
-
-        master.recv(fuc_str, count, MPI_CHAR, master.getRank() + 1, MPI_ANY_TAG, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        mpz_t sum_recv = {};
-        mpz_t fuc_recv = {};
-
-        mpz_init_set_str(sum_recv, sum_str, 10);
-        mpz_init_set_str(fuc_recv, fuc_str, 10);
-
-        delete [] sum_str;
-        delete [] fuc_str;
-
-        mpz_mul(sum_recv, sum_recv, fuc);
-        mpz_mul(fuc, fuc, fuc_recv);
-        mpz_add(sum, sum, sum_recv);
-
-        mpz_clears(sum_recv, fuc_recv, nullptr);
-
-        sum_str = mpz_get_str(nullptr, 10, sum);
-        fuc_str = mpz_get_str(nullptr, 10, fuc);
-
-        unsigned long sum_len = strlen(sum_str) + 1;
-        unsigned long fuc_len = strlen(fuc_str) + 1;
-
-        master.send(sum_str, sum_len, MPI_CHAR, master.getRank() - 1, 0, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        master.send(fuc_str, fuc_len, MPI_CHAR, master.getRank() - 1, 0, MPI_COMM_WORLD);
-        if (master.check()) return 1;
-
-        free(sum_str);
-        free(fuc_str);
-
-        mpz_clears(fuc, sum, nullptr);
     }
 
     return 0;
