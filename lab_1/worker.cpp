@@ -120,11 +120,16 @@ int Worker::Dump(FILE* file)
     fprintf(file, "T:   %lg\n", Equation::T);
     fprintf(file, "tau: %lg\n", Equation::tau);
     fprintf(file, "M:   %lu\n", Equation::M);
-    fprintf(file, "K:   %lu\n", Equation::K);
+    fprintf(file, "K:   %lu\n", m_K);
 
-    for (size_t i = 0; i < Equation::K * Equation::M; i++)
+    for (size_t i = 0; i < m_K; i++)
     {
-        fprintf(file, "%lg\n", m_result[i]);
+        for (size_t j = 0; j < m_M; j++)
+        {
+            if (j >= Equation::M) break;
+
+            fprintf(file, "%lg\n", m_result[i * m_M + j]);
+        }
     }
 
     return 0;

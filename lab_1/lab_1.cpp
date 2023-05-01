@@ -1,6 +1,8 @@
 #include "user_mpi.h"
 #include "worker.h"
 
+#include "unistd.h"
+
 int main(int argc, char** argv) 
 {
     UserMpi::MPI master(&argc, &argv);
@@ -12,10 +14,12 @@ int main(int argc, char** argv)
     master.setCommSize(MPI_COMM_WORLD);
     if (master.check()) return 1;
 
-    // cpu_set_t mask;
-    // CPU_ZERO(&mask);
-    // CPU_SET(2 * rank, &mask);
-    // sched_setaffinity(getpid(), sizeof(cpu_set_t), &mask);
+    int flag = argc > 1; 
+
+    cpu_set_t mask;
+    CPU_ZERO(&mask);
+    CPU_SET(master.getRank(), &mask);
+    sched_setaffinity(getpid(), sizeof(cpu_set_t), &mask);
 
     double start_time = MPI::Wtime();
 
@@ -35,13 +39,15 @@ int main(int argc, char** argv)
     if (master.getRank() == 0) 
     {
         printf("Time: %.5lf\n", end_time - start_time);
-#define ENABLE_SAVING_PICTURE
-        #ifdef ENABLE_SAVING_PICTURE
-        const char* name = "output.txt";
-        FILE* file = fopen(name, "w");
-        worker.Dump(file);
-        fclose(file);
-        #endif
+
+        if (flag)
+        {
+            FILE* file = fopen(argv[1], "w");
+            if (!file) return 1;
+
+            worker.Dump(file);
+            fclose(file);
+        }
     }
 
     return 0;
