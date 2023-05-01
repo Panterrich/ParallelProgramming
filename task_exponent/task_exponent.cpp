@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
           endPoint = N - ((master.getRank() + 1) * sectionSize + remains);
     }
 
-    mpf_set_default_prec(64 + std::ceil(4.5 * x));
+    mpf_set_default_prec(64 + std::ceil(8 * x));
 
     mpz_t fuc = {};
     mpz_t sum = {};

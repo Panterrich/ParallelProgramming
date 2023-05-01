@@ -22,12 +22,12 @@
 // Note that "nonblocking" refers ONLY to whether the data buffer is available for reuse after the call. No part of the MPI specification, for example, mandates concurent operation of data transfers and computation.
 
 static constexpr size_t min_size = 40000;
-static constexpr size_t max_size = 100000;
+static constexpr size_t max_size = 3000000; // 65480 ref for send and rsend
 static constexpr size_t step     = 1000;
 static constexpr size_t iters    = 1;
 
-// #define TEST_SENDS
-#define MEASURE
+#define TEST_SENDS
+// #define MEASURE
 
 int main(int argc, char* argv[])
 {
