@@ -46,6 +46,8 @@ set(TASK_INITIAL_3 "task_initial_3")
 set(TASK_EXPONENT  "task_exponent")
 set(TASK_NEW_COMM  "task_new_comm")
 set(TASK_SEND      "task_send")
+set(TASK_SORT      "task_sort")
+set(LAB_1          "lab_1")
 
 set(TASK_INITIAL_1_SRC
     task_initial/task_1.cpp
@@ -71,6 +73,15 @@ set(TASK_SEND_SRC
     task_send/task_send.cpp
 )
 
+set(TASK_SORT_SRC
+    task_sort/task_sort.cpp
+)
+
+set(LAB_1_SRC
+    lab_1/lab_1.cpp
+    lab_1/worker.cpp
+)
+
 # EXECUTABLE FILES
 add_executable(${TASK_INITIAL_1} ${TASK_INITIAL_1_SRC})
 add_executable(${TASK_INITIAL_2} ${TASK_INITIAL_2_SRC})
@@ -78,6 +89,8 @@ add_executable(${TASK_INITIAL_3} ${TASK_INITIAL_3_SRC})
 add_executable(${TASK_EXPONENT}  ${TASK_EXPONENT_SRC})
 add_executable(${TASK_NEW_COMM}  ${TASK_NEW_COMM_SRC})
 add_executable(${TASK_SEND}      ${TASK_SEND_SRC})
+add_executable(${TASK_SORT}      ${TASK_SORT_SRC})
+add_executable(${LAB_1}          ${LAB_1_SRC})
 
 target_link_libraries(${TASK_EXPONENT} gmp)
 
@@ -87,6 +100,8 @@ target_include_directories(${TASK_INITIAL_3} PRIVATE include/)
 target_include_directories(${TASK_EXPONENT}  PRIVATE include/)
 target_include_directories(${TASK_NEW_COMM}  PRIVATE include/)
 target_include_directories(${TASK_SEND}      PRIVATE include/)
+target_include_directories(${TASK_SORT}      PRIVATE include/)
+target_include_directories(${LAB_1}          PRIVATE include/)
 
 #########################################################################
 
