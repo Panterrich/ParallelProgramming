@@ -18,6 +18,9 @@ public:
         m_part{0},
         m_M{Equation::M},
         m_K{Equation::K},
+        m_tau{Equation::tau},
+        m_h{Equation::h},
+        m_inversed{0},
         m_data{nullptr},
         m_result{nullptr}
     {
@@ -62,6 +65,11 @@ private:
 
     size_t m_M;
     size_t m_K;
+
+    double m_tau;
+    double m_h;
+
+    int m_inversed;
 
     double* m_data;
     double* m_result;

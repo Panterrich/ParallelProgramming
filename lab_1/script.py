@@ -110,12 +110,14 @@ def TimeGraph(quiet):
 
             os.system(command)
 
+            x = 0
             with open(log) as f:
                 for line in f:
                     line = line.split()
                     time = line[1]
-
-                    data += float(time)
+                    if x == 2:
+                        data += float(time)
+                    x += 1
         
         data /= n_tests
         y.append(data)
@@ -142,6 +144,7 @@ def TimeGraph(quiet):
 
     plt.minorticks_on()
     plt.tight_layout()
+    plt.savefig(os.path.join(default_output_dir, "output.png"))
     plt.show()
             
 

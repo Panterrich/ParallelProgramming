@@ -21,9 +21,9 @@ int main(int argc, char** argv)
     CPU_SET(master.getRank(), &mask);
     sched_setaffinity(getpid(), sizeof(cpu_set_t), &mask);
 
-    double start_time = MPI::Wtime();
-
     Worker worker(master.getRank(), master.getCommSize());
+    
+    double start_time = MPI::Wtime();
     
     worker.FillInitialConditions();
     worker.FillFirstLine(&master);
