@@ -21,13 +21,13 @@
 //  As with MPI_Rsend, but nonblocking.
 // Note that "nonblocking" refers ONLY to whether the data buffer is available for reuse after the call. No part of the MPI specification, for example, mandates concurent operation of data transfers and computation.
 
-static constexpr size_t min_size = 40000;
-static constexpr size_t max_size = 3000000; // 65480 ref for send and rsend
+static constexpr size_t min_size = 1;
+static constexpr size_t max_size = 2; // 65480 ref for send and rsend
 static constexpr size_t step     = 1000;
-static constexpr size_t iters    = 1;
+static constexpr size_t iters    = 1000000;
 
-#define TEST_SENDS
-// #define MEASURE
+// #define TEST_SENDS
+#define MEASURE
 
 int main(int argc, char* argv[])
 {
@@ -193,20 +193,23 @@ int main(int argc, char* argv[])
         means = 0.f;
 
         for (size_t i = 0; i < iters; i++)
-        {
+        {   
+            master.barrier(MPI_COMM_WORLD);
+            if (master.check()) return 1;
+
             if (master.getRank() != 0) 
             {
                 start = MPI_Wtime();
 
                 master.send(buffer, size, MPI_CHAR, master.getRank() - 1, 0, MPI_COMM_WORLD);
-                if (master.check()) return 1;
 
                 end   = MPI_Wtime();
                 means += end - start;
+                if (master.check()) return 1;
             }
             else
             {
-                sleep(2);
+                // sleep(2);
                 master.recv(buffer, size, MPI_CHAR, master.getRank() + 1, 0, MPI_COMM_WORLD);
                 if (master.check()) return 1;
             }
