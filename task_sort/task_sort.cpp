@@ -4,7 +4,7 @@
 #include "user_mpi.h"
 
 static constexpr size_t ARRAY_SIZE = 3000000;
-static constexpr size_t N          = 100;
+static constexpr size_t N          = 1000;
 
 template <typename T>
 void merge(T* array, int left, int mid, int right, std::vector<T>& buffer) {
@@ -99,8 +99,6 @@ int main(int argc, char* argv[])
         {
             array[i] = i % N;
         }
-        
-        start = MPI_Wtime();
 
         displs     = new int[master.getCommSize()];
         sendcounts = new int[master.getCommSize()];
@@ -114,6 +112,8 @@ int main(int argc, char* argv[])
 
     int* sub_array = new int[size]{};
     std::vector<int> buffer(ARRAY_SIZE);
+
+    start = MPI_Wtime();
 
     master.scatterv(array, sendcounts, displs, MPI_INT, sub_array, size, MPI_INT, 0, MPI_COMM_WORLD);
     if (master.check()) return 1;
