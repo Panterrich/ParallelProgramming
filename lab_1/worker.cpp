@@ -111,31 +111,35 @@ int Worker::FillFirstLine(UserMpi::MPI* master)
 
 int Worker::FillOtherLines(UserMpi::MPI* master)
 {
-    double recv_value = 0;
+    double recv_value_start = 0;
+    double recv_value_end   = 0;
+    MPI_Request start;
+    MPI_Request end;
 
     for (size_t k = 1; k < m_K - 1; k++) 
     {
+        if (m_rank != 0)
+        {
+            master->isend(m_data + m_part * k + 0, 1, MPI::DOUBLE, m_rank - 1, 0, MPI_COMM_WORLD);
+            if (master->check()) return 1;
+
+            master->irecv(&recv_value_start, 1, MPI::DOUBLE, m_rank - 1, MPI_ANY_TAG, MPI_COMM_WORLD, &start);
+            if (master->check()) return 1;
+        }
+
         if (m_rank != m_commSize - 1) 
         {
-            master->send(m_data + m_part * k + m_part - 1, 1, MPI::DOUBLE, m_rank + 1, 0, MPI_COMM_WORLD);
+            master->isend(m_data + m_part * k + m_part - 1, 1, MPI::DOUBLE, m_rank + 1, 0, MPI_COMM_WORLD);
+            if (master->check()) return 1;
+
+            master->irecv(&recv_value_end, 1, MPI::DOUBLE, m_rank + 1, MPI_ANY_TAG, MPI_COMM_WORLD, &end);
             if (master->check()) return 1;
         }
 
-        if (m_rank != 0) 
+        for (size_t m = 1; m < m_part - 1; m++) 
         {
-            master->recv(&recv_value, 1, MPI::DOUBLE, m_rank - 1, MPI_ANY_TAG, MPI_COMM_WORLD);
-            if (master->check()) return 1;
-        }
-
-        for (size_t m = (m_rank == 0); m < m_part - 1; m++) 
-        {
-            if (m != 0) 
-            {
-                recv_value = m_data[m_part * k + m - 1];
-            }
-
-            double first_part  = (- m_data[m_part * (k - 1) + m]                 ) / (2 * m_tau);
-            double second_part = (  m_data[m_part *  k      + m + 1] - recv_value) / (2 * m_h);
+            double first_part  = (- m_data[m_part * (k - 1) + m]                                 ) / (2 * m_tau);
+            double second_part = (  m_data[m_part *  k      + m + 1] - m_data[m_part * k + m - 1]) / (2 * m_h);
 
             double f_part = m_inversed ? Equation::Func::f(k * m_tau, (m_start + m) * m_h) :
                                          Equation::Func::f((m_start + m) * m_h, k * m_tau);
@@ -144,17 +148,52 @@ int Worker::FillOtherLines(UserMpi::MPI* master)
                                                         (f_part -               first_part - Equation::a * second_part) * 2 * m_tau;
         }
 
-        size_t m = m_part - 1;
+        if (m_rank != 0)
+        {
+            master->wait(&start);
+            if (master->check()) return 1;
 
-        double first_part  = (  m_data[m_part * (k + 1) + m - 1] - m_data[m_part * k + m - 1] - m_data[m_part * k + m]) / (2 * m_tau);
-        double second_part = (- m_data[m_part * (k + 1) + m - 1] - m_data[m_part * k + m - 1] + m_data[m_part * k + m]) / (2 * m_h);
+            double first_part  = (- m_data[m_part * (k - 1) + 0]                       ) / (2 * m_tau);
+            double second_part = (  m_data[m_part *  k      + 0 + 1] - recv_value_start) / (2 * m_h);
 
-        double f_part = m_inversed ? Equation::Func::f((k + 0.5) * m_tau, (m_start + m + 0.5) * m_h) :
-                                     Equation::Func::f((m_start + m + 0.5) * m_h, (k + 0.5) * m_tau);
+            double f_part = m_inversed ? Equation::Func::f(k * m_tau, (m_start + 0) * m_h) :
+                                         Equation::Func::f((m_start + 0) * m_h, k * m_tau);
 
-        m_data[m_part * (k + 1) + m] = m_inversed ? 
-            (f_part - Equation::a * first_part -               second_part) * 2 / (Equation::a / m_tau +           1 / m_h) :
-            (f_part -               first_part - Equation::a * second_part) * 2 / (          1 / m_tau + Equation::a / m_h);
+            m_data[m_part * (k + 1) + 0] = m_inversed ? (f_part - Equation::a * first_part -               second_part) * 2 * m_tau / Equation::a :
+                                                        (f_part -               first_part - Equation::a * second_part) * 2 * m_tau;
+        }
+        
+        if (m_rank == m_commSize - 1)
+        {
+            size_t m = m_part - 1;
+
+            double first_part  = (  m_data[m_part * (k + 1) + m - 1] - m_data[m_part * k + m - 1] - m_data[m_part * k + m]) / (2 * m_tau);
+            double second_part = (- m_data[m_part * (k + 1) + m - 1] - m_data[m_part * k + m - 1] + m_data[m_part * k + m]) / (2 * m_h);
+
+            double f_part = m_inversed ? Equation::Func::f((k + 0.5) * m_tau, (m_start + m + 0.5) * m_h) :
+                                        Equation::Func::f((m_start + m + 0.5) * m_h, (k + 0.5) * m_tau);
+
+            m_data[m_part * (k + 1) + m] = m_inversed ? 
+                (f_part - Equation::a * first_part -               second_part) * 2 / (Equation::a / m_tau +           1 / m_h) :
+                (f_part -               first_part - Equation::a * second_part) * 2 / (          1 / m_tau + Equation::a / m_h);
+        }
+        else
+        {
+            size_t m = m_part - 1;
+
+            master->wait(&end);
+            if (master->check()) return 1;
+
+            double first_part  = (- m_data[m_part * (k - 1) + m]                             ) / (2 * m_tau);
+            double second_part = (  recv_value_end               - m_data[m_part * k + m - 1]) / (2 * m_h);
+
+            double f_part = m_inversed ? Equation::Func::f(k * m_tau, (m_start + m) * m_h) :
+                                         Equation::Func::f((m_start + m) * m_h, k * m_tau);
+
+            m_data[m_part * (k + 1) + m] = m_inversed ? (f_part - Equation::a * first_part -               second_part) * 2 * m_tau / Equation::a :
+                                                        (f_part -               first_part - Equation::a * second_part) * 2 * m_tau;
+        }
+
     }
 
     return 0;

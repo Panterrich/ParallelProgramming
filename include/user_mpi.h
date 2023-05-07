@@ -96,9 +96,33 @@ public:
         m_error = MPI_Bsend(buffer, count, type, dst, tag, comm);
     }
 
+    inline void isend(const void* buffer, int count, MPI_Datatype type, int dst, int tag, MPI_Comm comm, MPI_Request* request = nullptr)
+    {
+        if (request == nullptr)
+            request = &m_request;
+
+        m_error = MPI_Isend(buffer, count, type, dst, tag, comm, request);
+    }
+
     inline void recv(void* buffer, int count, MPI_Datatype type, int src, int tag, MPI_Comm comm)
     {
         m_error = MPI_Recv(buffer, count, type, src, tag, comm, &m_status);
+    }
+
+    inline void irecv(void* buffer, int count, MPI_Datatype type, int dst, int tag, MPI_Comm comm, MPI_Request* request = nullptr)
+    {
+        if (request == nullptr)
+            request = &m_request;
+
+        m_error = MPI_Irecv(buffer, count, type, dst, tag, comm, request);
+    }
+
+    inline void wait(MPI_Request* request = nullptr)
+    {
+        if (request == nullptr)
+            request = &m_request;
+
+        m_error = MPI_Wait(request, &m_status);
     }
 
     inline void probe(int src, int tag, MPI_Comm comm)
@@ -150,11 +174,17 @@ public:
         return m_status;
     }
 
+    inline const MPI_Request& getRequest() const
+    {
+        return m_request;
+    }
+
 private:
     int  m_commSize;
     int  m_rank;
 
     MPI_Status m_status;
+    MPI_Request m_request;
 
     char m_buffer[MPI_MAX_ERROR_STRING];
     int  m_len;
