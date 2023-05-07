@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 
 executable = './build/task_sort'
 max_proc = 6
-n_tests  = 6
+n_tests  = 4
 
 default_output_dir = os.path.join(os.path.split(os.path.dirname(os.path.relpath(os.path.realpath(__file__))))[0], 'output/')
 
@@ -20,6 +20,7 @@ def main():
     subparsers = parser.add_subparsers(help='targets', dest='target')
 
     subparsers.add_parser('time', help='Time graph')
+    subparsers.add_parser('memory', help='Memory graph')
 
     args = parser.parse_args()
 
@@ -36,6 +37,9 @@ def main():
     if target == 'time':
         TimeGraph(quiet)
 
+    elif target == 'memory':
+        MemoryGraph(quiet)
+
 def TimeGraph(quiet):
     log = os.path.join(default_output_dir, 'output.txt')
 
@@ -47,7 +51,7 @@ def TimeGraph(quiet):
 
         for j in range(n_tests):
             
-            command = "mpirun -np " + str(i) + " " + executable + " > " + log
+            command = "mpirun -np " + str(i) + " " + executable + " 3000000 " + " > " + log
 
             if not quiet:
                 print(command)
@@ -89,6 +93,91 @@ def TimeGraph(quiet):
     plt.minorticks_on()
     plt.tight_layout()
     plt.savefig(os.path.join(default_output_dir, "output.png"))
+    plt.show()
+
+
+def MemoryGraph(quiet):
+    log = os.path.join(default_output_dir, 'output.txt')
+
+    y = []
+    x = []
+    z = []
+    Z = []
+
+    memory = 1000
+
+    while (memory < 100000000):
+
+        data = 0
+
+        for j in range(n_tests):
+            
+            command = "mpirun -np " + str(1) + " " + executable + " " + str(memory) + " > " + log
+
+            if not quiet:
+                print(command)
+
+            os.system(command)
+
+            b = 0
+            with open(log) as f:
+                for line in f:
+                    line = line.split()
+                    time = line[1]
+                    if b == 0:
+                        data += float(time)
+                        break
+                    b += 1
+        
+        data /= n_tests
+        y.append(data)
+        x.append(memory)
+        memory *= 10
+
+    print(y)
+
+    for i in range(len(x)):
+        z.append(x[i] * np.log(x[i]) * y[0] / (x[0] * np.log(x[0])))
+        # Z.append(x[i] * np.log(x[i]) * y[1])
+
+    plt.figure(figsize = (16, 16), facecolor = "white") # Создаем фигуру
+    plt.style.use('default')
+
+    plt.title(r'S(p)')
+    plt.ylabel(r'$S$')
+    plt.xlabel(r"n proc")
+
+    plt.plot(x, y, label = "Time")
+    plt.plot(x, z, label = "Time const n log n")
+
+    plt.grid(visible = True, which = 'major', axis = 'both', alpha = 1, linewidth = 0.9)   # Активируем сетку
+    plt.grid(visible = True, which = 'minor', axis = 'both', alpha = 0.5, linestyle = ':')
+
+    plt.minorticks_on()
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(default_output_dir, "output1.png"))
+    plt.show()
+
+    plt.figure(figsize = (16, 16), facecolor = "white") # Создаем фигуру
+    plt.style.use('default')
+
+    plt.title(r'S(p)')
+    plt.ylabel(r'$S$')
+    plt.xlabel(r"n proc")
+    plt.xscale('log')
+    plt.yscale('log')
+
+    plt.plot(x, y, label = "Time")
+    plt.plot(x, z, label = "Time const n log n")
+
+    plt.grid(visible = True, which = 'major', axis = 'both', alpha = 1, linewidth = 0.9)   # Активируем сетку
+    plt.grid(visible = True, which = 'minor', axis = 'both', alpha = 0.5, linestyle = ':')
+
+    plt.minorticks_on()
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(default_output_dir, "output1.png"))
     plt.show()
 
 if __name__ == "__main__":

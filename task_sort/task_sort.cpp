@@ -3,8 +3,7 @@
 
 #include "user_mpi.h"
 
-static constexpr size_t ARRAY_SIZE = 3000000;
-static constexpr size_t N          = 1000;
+static constexpr size_t N = 1000;
 
 template <typename T>
 void merge(T* array, int left, int mid, int right, std::vector<T>& buffer) {
@@ -78,6 +77,12 @@ int main(int argc, char* argv[])
 
     master.setCommSize(MPI_COMM_WORLD);
     if (master.check()) return 1;
+
+    char* end_str = nullptr;
+    size_t ARRAY_SIZE = strtoul(argv[1], &end_str, 10);
+
+    if ((errno == ERANGE) || (*end_str != '\0'))
+        return 1;
 
     unsigned long sectionSize = ARRAY_SIZE / master.getCommSize();
     unsigned long remains     = ARRAY_SIZE % master.getCommSize();
