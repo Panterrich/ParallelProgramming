@@ -51,6 +51,7 @@ set(LAB_1          "lab_1")
 set(TASK_PTHREAD_1 "task_pthread_1")
 set(TASK_PTHREAD_2 "task_pthread_2")
 set(TASK_PTHREAD_3 "task_pthread_3")
+set(LAB_2          "lab_2")
 
 set(TASK_INITIAL_1_SRC
     task_initial/task_1.cpp
@@ -97,6 +98,10 @@ set(TASK_PTHREAD_3_SRC
     task_pthread/task_3.cpp
 )
 
+set(LAB_2_SRC
+    lab_2/lab_2.cpp
+)
+
 # EXECUTABLE FILES
 add_executable(${TASK_INITIAL_1} ${TASK_INITIAL_1_SRC})
 add_executable(${TASK_INITIAL_2} ${TASK_INITIAL_2_SRC})
@@ -109,6 +114,7 @@ add_executable(${LAB_1}          ${LAB_1_SRC})
 add_executable(${TASK_PTHREAD_1} ${TASK_PTHREAD_1_SRC})
 add_executable(${TASK_PTHREAD_2} ${TASK_PTHREAD_2_SRC})
 add_executable(${TASK_PTHREAD_3} ${TASK_PTHREAD_3_SRC})
+add_executable(${LAB_2}          ${LAB_2_SRC})
 
 target_link_libraries(${TASK_EXPONENT} gmp)
 
@@ -123,6 +129,7 @@ target_include_directories(${LAB_1}          PRIVATE include/)
 target_include_directories(${TASK_PTHREAD_1} PRIVATE include/)
 target_include_directories(${TASK_PTHREAD_2} PRIVATE include/)
 target_include_directories(${TASK_PTHREAD_3} PRIVATE include/)
+target_include_directories(${LAB_2}          PRIVATE include/)
 
 #########################################################################
 

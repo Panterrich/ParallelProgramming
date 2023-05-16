@@ -71,8 +71,9 @@ int main(int argc, char* argv[])
         printf("tasks: %lu\n", tasks[i]);
     }
 
-    //std::cout << "Result: " << shared.sum << std::endl;
-    std::cout << std::fixed << "Result: " << std::setprecision(-std::ceil(std::log10(shared.eps))) << shared.sum << std::endl;
+    printf("%.12lf\n", shared.sum);
+    // std::cout << "Result: " << shared.sum << std::endl;
+    //std::cout << std::fixed << "Result: " << std::setprecision(-std::ceil(std::log10(shared.eps))) << shared.sum << std::endl;
     std::cout << "Time: " << static_cast<double>(elapsed_ms.count()) / 1000.f << std::endl;
 
     DestroySharedMemory();
@@ -130,7 +131,7 @@ void* routine_integrate(void* arg)
 
                 double s_acb = s_ac + s_cb;
 
-                if (std::abs(s - s_acb) >= shared.eps * std::abs(s_acb))
+                if (std::abs(s - s_acb) >= shared.eps * std::abs(s_acb) && std::abs(s - s_acb) > std::numeric_limits<double>::epsilon())
                 {
                     lstack.push({a, c, fa, fc, s_ac});
                     n_task++;
