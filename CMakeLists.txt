@@ -1,7 +1,7 @@
 #########################################################################
 
 # CMAKE MINIMAL VERSION
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.13)
 
 # PROJECT PROPERTIES
 project ("Parallel programming" LANGUAGES CXX)
@@ -10,8 +10,13 @@ project ("Parallel programming" LANGUAGES CXX)
 
 find_package(MPI REQUIRED)
 
+set(CMAKE_CXX_COMPILER
+    /usr/bin/mpic++
+)
+
 # COMPILE OPTIONS
 add_compile_options(
+    -fopenmp
     -Wall
 
     # -Wno-pointer-to-int-cast
@@ -25,16 +30,17 @@ add_compile_options(
     # -Wno-format
 )
 
-set(CMAKE_CXX_COMPILER
-    /usr/bin/mpic++
-)
-
 set(DEBUG_COMPILER_OPTIONS
     -g -O1 -DDBG
 )
 
 set(RELEASE_COMPILER_OPTIONS
     -O2
+)
+
+# LINK OPTIONS
+add_link_options(
+    -fopenmp
 )
 
 #########################################################################
@@ -53,13 +59,17 @@ set(TASK_PTHREAD_2 "task_pthread_2")
 set(TASK_PTHREAD_3 "task_pthread_3")
 set(LAB_2          "lab_2")
 
+set(TASK_INITIAL_OMP_1 "task_initial_omp_1")
+set(TASK_INITIAL_OMP_2 "task_initial_omp_2")
+set(TASK_INITIAL_OMP_3 "task_initial_omp_3")
+
 set(TASK_INITIAL_1_SRC
     task_initial/task_1.cpp
 )
 
 set(TASK_INITIAL_2_SRC
     task_initial/task_2.cpp
-)   
+)
 
 set(TASK_INITIAL_3_SRC
     task_initial/task_3.cpp
@@ -92,7 +102,7 @@ set(TASK_PTHREAD_1_SRC
 
 set(TASK_PTHREAD_2_SRC
     task_pthread/task_2.cpp
-)   
+)
 
 set(TASK_PTHREAD_3_SRC
     task_pthread/task_3.cpp
@@ -100,6 +110,18 @@ set(TASK_PTHREAD_3_SRC
 
 set(LAB_2_SRC
     lab_2/lab_2.cpp
+)
+
+set(TASK_INITIAL_OMP_1_SRC
+    task_initial_omp/task_1.cpp
+)
+
+set(TASK_INITIAL_OMP_2_SRC
+    task_initial_omp/task_2.cpp
+)
+
+set(TASK_INITIAL_OMP_3_SRC
+    task_initial_omp/task_3.cpp
 )
 
 # EXECUTABLE FILES
@@ -115,6 +137,10 @@ add_executable(${TASK_PTHREAD_1} ${TASK_PTHREAD_1_SRC})
 add_executable(${TASK_PTHREAD_2} ${TASK_PTHREAD_2_SRC})
 add_executable(${TASK_PTHREAD_3} ${TASK_PTHREAD_3_SRC})
 add_executable(${LAB_2}          ${LAB_2_SRC})
+
+add_executable(${TASK_INITIAL_OMP_1} ${TASK_INITIAL_OMP_1_SRC})
+add_executable(${TASK_INITIAL_OMP_2} ${TASK_INITIAL_OMP_2_SRC})
+add_executable(${TASK_INITIAL_OMP_3} ${TASK_INITIAL_OMP_3_SRC})
 
 target_link_libraries(${TASK_EXPONENT} gmp)
 
