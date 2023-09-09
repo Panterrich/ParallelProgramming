@@ -30,17 +30,17 @@ add_compile_options(
     # -Wno-format
 )
 
+# LINK OPTIONS
+add_link_options(
+    -fopenmp
+)
+
 set(DEBUG_COMPILER_OPTIONS
     -g -O1 -DDBG
 )
 
 set(RELEASE_COMPILER_OPTIONS
     -O2
-)
-
-# LINK OPTIONS
-add_link_options(
-    -fopenmp
 )
 
 #########################################################################
@@ -62,6 +62,9 @@ set(LAB_2          "lab_2")
 set(TASK_INITIAL_OMP_1 "task_initial_omp_1")
 set(TASK_INITIAL_OMP_2 "task_initial_omp_2")
 set(TASK_INITIAL_OMP_3 "task_initial_omp_3")
+set(TASK_COPYIN        "task_copyin")
+set(TASK_SCHEDULE      "task_schedule")
+set(TASK_NESTED        "task_nested")
 
 set(TASK_INITIAL_1_SRC
     task_initial/task_1.cpp
@@ -124,6 +127,18 @@ set(TASK_INITIAL_OMP_3_SRC
     task_initial_omp/task_3.cpp
 )
 
+set(TASK_COPYIN_SRC
+    task_copyin/task_copyin.cpp
+)
+
+set(TASK_SCHEDULE_SRC
+    task_schedule/task_schedule.cpp
+)
+
+set(TASK_NESTED_SRC
+    task_nested/task_nested.cpp
+)
+
 # EXECUTABLE FILES
 add_executable(${TASK_INITIAL_1} ${TASK_INITIAL_1_SRC})
 add_executable(${TASK_INITIAL_2} ${TASK_INITIAL_2_SRC})
@@ -141,6 +156,9 @@ add_executable(${LAB_2}          ${LAB_2_SRC})
 add_executable(${TASK_INITIAL_OMP_1} ${TASK_INITIAL_OMP_1_SRC})
 add_executable(${TASK_INITIAL_OMP_2} ${TASK_INITIAL_OMP_2_SRC})
 add_executable(${TASK_INITIAL_OMP_3} ${TASK_INITIAL_OMP_3_SRC})
+add_executable(${TASK_COPYIN}        ${TASK_COPYIN_SRC})
+add_executable(${TASK_SCHEDULE}      ${TASK_SCHEDULE_SRC})
+add_executable(${TASK_NESTED}        ${TASK_NESTED_SRC})
 
 target_link_libraries(${TASK_EXPONENT} gmp)
 

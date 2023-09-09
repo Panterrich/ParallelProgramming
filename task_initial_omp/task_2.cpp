@@ -37,24 +37,11 @@ int main(const int argc, const char* argv[])
 
     double sum = 0;
 
-    #pragma omp parallel
-    {
-        double res = 0;
-
-        #pragma omp for
+    #pragma omp parallel for reduction(+: sum)
         for (unsigned long i = 1; i <= N; i++)
         {
-            res += 1.0f / i;
+            sum += 1.0f / i;
         }
-
-        #pragma omp critical
-        {
-            printf("(res: %-8.4lg (%2d/%d)\n", res,
-                   omp_get_thread_num(), omp_get_num_threads());
-
-            sum += res;
-        }
-    }
 
     printf("The sum of the first %lu terms of the harmonic series is equal to %lg\n", N, sum);
 }
