@@ -3,9 +3,6 @@
 # CMAKE MINIMAL VERSION
 cmake_minimum_required (VERSION 3.13)
 
-# PROJECT PROPERTIES
-project ("Parallel programming" LANGUAGES CXX)
-
 #########################################################################
 
 find_package(MPI REQUIRED)
@@ -18,22 +15,20 @@ set(CMAKE_CXX_COMPILER
 add_compile_options(
     -fopenmp
     -Wall
-
-    # -Wno-pointer-to-int-cast
-    # -Wno-int-to-pointer-cast
-    # -Wno-variadic-macros
-    # -Wno-unused-variable
-    # -Wno-unused-parameter
-    # -Wno-unused-function
-    # -Wno-sign-compare
-    # -Wno-misleading-indentation
-    # -Wno-format
+    -Wextra
+    -Werror
 )
 
 # LINK OPTIONS
 add_link_options(
     -fopenmp
 )
+
+#########################################################################
+
+# PROJECT PROPERTIES
+project ("Parallel programming" LANGUAGES CXX)
+
 
 set(DEBUG_COMPILER_OPTIONS
     -g -O1 -DDBG
@@ -45,137 +40,27 @@ set(RELEASE_COMPILER_OPTIONS
 
 #########################################################################
 
-# EXECUTABLE FILES PROPERTIES
-set(TASK_INITIAL_1 "task_initial_1")
-set(TASK_INITIAL_2 "task_initial_2")
-set(TASK_INITIAL_3 "task_initial_3")
-set(TASK_EXPONENT  "task_exponent")
-set(TASK_NEW_COMM  "task_new_comm")
-set(TASK_SEND      "task_send")
-set(TASK_SORT      "task_sort")
-set(LAB_1          "lab_1")
-set(TASK_PTHREAD_1 "task_pthread_1")
-set(TASK_PTHREAD_2 "task_pthread_2")
-set(TASK_PTHREAD_3 "task_pthread_3")
-set(LAB_2          "lab_2")
-
-set(TASK_INITIAL_OMP_1 "task_initial_omp_1")
-set(TASK_INITIAL_OMP_2 "task_initial_omp_2")
-set(TASK_INITIAL_OMP_3 "task_initial_omp_3")
-set(TASK_COPYIN        "task_copyin")
-set(TASK_SCHEDULE      "task_schedule")
-set(TASK_NESTED        "task_nested")
-
-set(TASK_INITIAL_1_SRC
-    task_initial/task_1.cpp
+include_directories(
+    include/
 )
-
-set(TASK_INITIAL_2_SRC
-    task_initial/task_2.cpp
-)
-
-set(TASK_INITIAL_3_SRC
-    task_initial/task_3.cpp
-)
-
-set(TASK_EXPONENT_SRC
-    task_exponent/task_exponent.cpp
-)
-
-set(TASK_NEW_COMM_SRC
-    task_new_comm/task_new_comm.cpp
-)
-
-set(TASK_SEND_SRC
-    task_send/task_send.cpp
-)
-
-set(TASK_SORT_SRC
-    task_sort/task_sort.cpp
-)
-
-set(LAB_1_SRC
-    lab_1/lab_1.cpp
-    lab_1/worker.cpp
-)
-
-set(TASK_PTHREAD_1_SRC
-    task_pthread/task_1.cpp
-)
-
-set(TASK_PTHREAD_2_SRC
-    task_pthread/task_2.cpp
-)
-
-set(TASK_PTHREAD_3_SRC
-    task_pthread/task_3.cpp
-)
-
-set(LAB_2_SRC
-    lab_2/lab_2.cpp
-)
-
-set(TASK_INITIAL_OMP_1_SRC
-    task_initial_omp/task_1.cpp
-)
-
-set(TASK_INITIAL_OMP_2_SRC
-    task_initial_omp/task_2.cpp
-)
-
-set(TASK_INITIAL_OMP_3_SRC
-    task_initial_omp/task_3.cpp
-)
-
-set(TASK_COPYIN_SRC
-    task_copyin/task_copyin.cpp
-)
-
-set(TASK_SCHEDULE_SRC
-    task_schedule/task_schedule.cpp
-)
-
-set(TASK_NESTED_SRC
-    task_nested/task_nested.cpp
-)
-
-# EXECUTABLE FILES
-add_executable(${TASK_INITIAL_1} ${TASK_INITIAL_1_SRC})
-add_executable(${TASK_INITIAL_2} ${TASK_INITIAL_2_SRC})
-add_executable(${TASK_INITIAL_3} ${TASK_INITIAL_3_SRC})
-add_executable(${TASK_EXPONENT}  ${TASK_EXPONENT_SRC})
-add_executable(${TASK_NEW_COMM}  ${TASK_NEW_COMM_SRC})
-add_executable(${TASK_SEND}      ${TASK_SEND_SRC})
-add_executable(${TASK_SORT}      ${TASK_SORT_SRC})
-add_executable(${LAB_1}          ${LAB_1_SRC})
-add_executable(${TASK_PTHREAD_1} ${TASK_PTHREAD_1_SRC})
-add_executable(${TASK_PTHREAD_2} ${TASK_PTHREAD_2_SRC})
-add_executable(${TASK_PTHREAD_3} ${TASK_PTHREAD_3_SRC})
-add_executable(${LAB_2}          ${LAB_2_SRC})
-
-add_executable(${TASK_INITIAL_OMP_1} ${TASK_INITIAL_OMP_1_SRC})
-add_executable(${TASK_INITIAL_OMP_2} ${TASK_INITIAL_OMP_2_SRC})
-add_executable(${TASK_INITIAL_OMP_3} ${TASK_INITIAL_OMP_3_SRC})
-add_executable(${TASK_COPYIN}        ${TASK_COPYIN_SRC})
-add_executable(${TASK_SCHEDULE}      ${TASK_SCHEDULE_SRC})
-add_executable(${TASK_NESTED}        ${TASK_NESTED_SRC})
-
-target_link_libraries(${TASK_EXPONENT} gmp)
-
-target_include_directories(${TASK_INITIAL_1} PRIVATE include/)
-target_include_directories(${TASK_INITIAL_2} PRIVATE include/)
-target_include_directories(${TASK_INITIAL_3} PRIVATE include/)
-target_include_directories(${TASK_EXPONENT}  PRIVATE include/)
-target_include_directories(${TASK_NEW_COMM}  PRIVATE include/)
-target_include_directories(${TASK_SEND}      PRIVATE include/)
-target_include_directories(${TASK_SORT}      PRIVATE include/)
-target_include_directories(${LAB_1}          PRIVATE include/)
-target_include_directories(${TASK_PTHREAD_1} PRIVATE include/)
-target_include_directories(${TASK_PTHREAD_2} PRIVATE include/)
-target_include_directories(${TASK_PTHREAD_3} PRIVATE include/)
-target_include_directories(${LAB_2}          PRIVATE include/)
 
 #########################################################################
+
+add_subdirectory(lab_1)
+add_subdirectory(lab_2)
+add_subdirectory(task_copyin)
+add_subdirectory(task_exponent)
+add_subdirectory(task_initial)
+add_subdirectory(task_initial_omp)
+add_subdirectory(task_nested)
+add_subdirectory(task_new_comm)
+add_subdirectory(task_pthread)
+add_subdirectory(task_schedule)
+add_subdirectory(task_send)
+add_subdirectory(task_sort)
+
+#########################################################################
+
 
 foreach(TARGET IN LISTS TARGETS)
 
@@ -189,4 +74,4 @@ foreach(TARGET IN LISTS TARGETS)
 
 endforeach()
 
-#########################################################################
+
