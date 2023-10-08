@@ -5,6 +5,10 @@ cmake_minimum_required (VERSION 3.13)
 
 #########################################################################
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
 find_package(MPI REQUIRED)
 
 set(CMAKE_CXX_COMPILER
@@ -46,25 +50,27 @@ include_directories(
 
 #########################################################################
 
-add_subdirectory(lab_1)
-add_subdirectory(lab_2)
-add_subdirectory(task_copyin)
-add_subdirectory(task_exponent)
-add_subdirectory(task_initial)
-add_subdirectory(task_initial_omp)
-add_subdirectory(task_nested)
-add_subdirectory(task_new_comm)
-add_subdirectory(task_pthread)
-add_subdirectory(task_schedule)
-add_subdirectory(task_send)
-add_subdirectory(task_sort)
+add_subdirectory(tasks/lab_1)
+add_subdirectory(tasks/lab_2)
+add_subdirectory(tasks/task_copyin)
+add_subdirectory(tasks/task_exponent)
+add_subdirectory(tasks/task_initial)
+add_subdirectory(tasks/task_initial_omp)
+add_subdirectory(tasks/task_matrix)
+add_subdirectory(tasks/task_nested)
+add_subdirectory(tasks/task_new_comm)
+add_subdirectory(tasks/task_pthread)
+add_subdirectory(tasks/task_schedule)
+add_subdirectory(tasks/task_send)
+add_subdirectory(tasks/task_sort)
+add_subdirectory(tasks/task_sort_omp)
 
 #########################################################################
 
 
 foreach(TARGET IN LISTS TARGETS)
 
-    option(DEBUG_BUILD "Build debug project version." ON)
+    option(DEBUG_BUILD "Build debug project version." OFF)
 
     if (DEBUG_BUILD)
         target_compile_options(${TARGET} PRIVATE ${DEBUG_COMPILER_OPTIONS})
