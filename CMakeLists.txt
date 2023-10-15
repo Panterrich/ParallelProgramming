@@ -17,6 +17,7 @@ set(CMAKE_CXX_COMPILER
 
 # COMPILE OPTIONS
 add_compile_options(
+    -mavx
     -fopenmp
     -Wall
     -Wextra
