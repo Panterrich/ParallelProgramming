@@ -27,6 +27,7 @@ add_compile_options(
 # LINK OPTIONS
 add_link_options(
     -fopenmp
+    -lOpenCL
 )
 
 #########################################################################
@@ -53,6 +54,7 @@ include_directories(
 
 add_subdirectory(tasks/lab_1)
 add_subdirectory(tasks/lab_2)
+add_subdirectory(tasks/omp_lab_1)
 add_subdirectory(tasks/task_copyin)
 add_subdirectory(tasks/task_exponent)
 add_subdirectory(tasks/task_initial)
