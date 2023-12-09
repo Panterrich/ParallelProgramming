@@ -4,7 +4,6 @@
 #include <iostream>
 #include <CL/opencl.hpp>
 
-
 int main()
 {
     // get all platforms (drivers), e.g. NVIDIA
@@ -15,6 +14,11 @@ int main()
     {
         std::cout << "No platforms found. Check OpenCL installation!\n";
         return 1;
+    }
+
+    for (auto it: allPlatforms)
+    {
+        std::cout << "Platform: " << it.getInfo<CL_PLATFORM_NAME>() << std::endl;
     }
 
     cl::Platform defaultPlatform = allPlatforms[0];
@@ -29,6 +33,11 @@ int main()
     {
         std::cout << "No devices found. Check OpenCL installation!\n";
         return 1;
+    }
+
+    for (auto it: allDevices)
+    {
+        std::cout << "Device: " << it.getInfo<CL_DEVICE_NAME>() << std::endl;
     }
 
     cl::Device defaultDevice = allDevices[0];

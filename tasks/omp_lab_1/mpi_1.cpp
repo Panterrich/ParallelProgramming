@@ -6,8 +6,8 @@
 
 #include "user_mpi.h"
 
-static const size_t kISize = 10000;
-static const size_t kJSize = 10000;
+static const size_t kISize = 20000;
+static const size_t kJSize = 20000;
 
 /**
  *  D (1, -1) => d (<, >) => потоковая зависимость
@@ -35,6 +35,8 @@ int main(int argc, char* argv[])
     size_t remains     = (kJSize - 1) % master.getCommSize();
     size_t size        = sectionSize + (master.getRank() < static_cast<int>(remains));
 
+    size *= kJSize;
+
     if (master.getRank() == 0)
     {
         a = new double[kISize * kJSize];
@@ -59,6 +61,9 @@ int main(int argc, char* argv[])
         {
             displs[i]     = (i < static_cast<int>(remains)) ? (sectionSize + 1) * i : sectionSize * i + remains;
             sendcounts[i] = sectionSize + (i < static_cast<int>(remains));
+
+            displs[i]     *= kJSize;
+            sendcounts[i] *= kJSize;
         }
     }
 
@@ -69,22 +74,14 @@ int main(int argc, char* argv[])
     double time  = 0;
     double start = MPI_Wtime();
 
-    for (size_t i = 1; i < kISize; i++)
-    {
-        master.scatterv(a + (i - 1) * kJSize + 1, sendcounts, displs, MPI_DOUBLE, recv, size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-        if (master.check()) return 1;
+    master.scatterv(a, sendcounts, displs, MPI_DOUBLE, recv, size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    if (master.check()) return 1;
 
-        time -= MPI_Wtime();
+    time -= MPI_Wtime();
 
-        for (size_t j = 0; j < size; j++)
-            recv[j] = std::sin(2 * recv[j]);
 
-        master.gatherv(recv, size, MPI_DOUBLE, a + i * kJSize, sendcounts, displs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-        time += MPI_Wtime();
-
-        master.barrier(MPI_COMM_WORLD);
-    }
+    for (size_t j = beginPoint; j < size + i; j++)
+        b[i * kJSize + j - i] = std::sin(2 * b[(i - 1) * kJSize + (j - i + 1)]);
 
     double end = MPI_Wtime();
 

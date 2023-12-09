@@ -1,0 +1,2 @@
+Time:                   1.93786752
+Time (without scatter): 1.20850363

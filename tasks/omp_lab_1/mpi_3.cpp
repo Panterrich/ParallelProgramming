@@ -6,8 +6,8 @@
 
 #include "user_mpi.h"
 
-static const size_t kISize = 10000;
-static const size_t kJSize = 10000;
+static const size_t kISize = 15000;
+static const size_t kJSize = 15000;
 
 /**
  *  D (1, -1) => d (<, >) => потоковая зависимость

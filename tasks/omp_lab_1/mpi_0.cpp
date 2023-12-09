@@ -6,8 +6,8 @@
 
 #include "user_mpi.h"
 
-static const size_t kISize = 10000;
-static const size_t kJSize = 10000;
+static const size_t kISize = 20000;
+static const size_t kJSize = 20000;
 
 int main(int argc, char* argv[])
 {
@@ -63,7 +63,6 @@ int main(int argc, char* argv[])
     }
 
     recv = new double[size];
-
 
     master.barrier(MPI_COMM_WORLD);
 
